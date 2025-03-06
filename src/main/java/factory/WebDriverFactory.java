@@ -10,38 +10,17 @@ import java.util.Locale;
 
 public class WebDriverFactory {
 
-  private final String browserName = System.getProperty("browser.name").trim().toLowerCase(Locale.ROOT);
-  private final String remoteUrl = System.getProperty("remote.url", "");
+  private String browserName = System.getProperty("browser.name").trim().toLowerCase(Locale.ROOT);
 
   public WebDriver create() {
-    if (!remoteUrl.isEmpty()) {
-      return createRemoteDriver();
-    }
-
-    return createLocalDriver();
-  }
-
-  private WebDriver createLocalDriver() {
     switch (browserName) {
       case "chrome": {
         WebDriverManager.chromedriver().setup();
         return new ChromeDriver((ChromeOptions) new ChromeSettings().settings());
       }
-      default:
-        throw new BrowserNotSupportedException(browserName);
     }
+
+    throw new BrowserNotSupportedException(browserName);
   }
 
-  private WebDriver createRemoteDriver() {
-    RemoteWebDriverFactory remoteFactory = new RemoteWebDriverFactory(remoteUrl);
-
-    switch (browserName) {
-      case "chrome": {
-        ChromeOptions options = (ChromeOptions) new ChromeSettings().settings();
-        return remoteFactory.createRemoteDriver(options);
-      }
-      default:
-        throw new BrowserNotSupportedException(browserName);
-    }
-  }
 }
